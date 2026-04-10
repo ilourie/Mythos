@@ -1,0 +1,439 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mythos Basket — Thresher Fixed</title>
+<script>(function(){try{localStorage.setItem("m4",'[{"k":"NVDA","entry":178.09,"current":188.15},{"k":"AVGO","entry":333.85,"current":371.58},{"k":"AMD","entry":221.43,"current":245.1},{"k":"TSM","entry":345.11,"current":369.89},{"k":"ASML","entry":1303.3,"current":1478.04},{"k":"LRCX","entry":224.24,"current":263.52},{"k":"EWY","entry":127.19,"current":138.67},{"k":"MU","entry":377.55,"current":420.16},{"k":"AMAT","entry":354.2,"current":399.05},{"k":"ANET","entry":133.58,"current":147.74},{"k":"COHR","entry":254.95,"current":306.49},{"k":"LITE","entry":814.82,"current":894.91},{"k":"CSCO","entry":80.7,"current":82.19},{"k":"FN","entry":557.86,"current":660},{"k":"AMZN","entry":213.77,"current":238.18},{"k":"GOOGL","entry":305.41,"current":317.19},{"k":"VST","entry":153.69,"current":154.25},{"k":"VRT","entry":262.26,"current":294.9},{"k":"BE","entry":135.85,"current":166.56},{"k":"CEG","entry":272.51,"current":285.55},{"k":"PANW","entry":169.87,"current":155.75},{"k":"QQQ","entry":588.67,"current":610.51},{"k":"SOXX","entry":347.68,"current":386.21}]');localStorage.setItem("m4cv",'{"NVDA":true,"AVGO":true,"AMD":true,"TSM":true,"ASML":true,"LRCX":true,"EWY":true,"MU":true,"AMAT":true,"ANET":true,"COHR":true,"LITE":true,"CSCO":true,"FN":true,"AMZN":true,"GOOGL":true,"VST":true,"VRT":true,"BE":true,"CEG":true,"PANW":true,"QQQ":true,"SOXX":true}');}catch(e){}})();</script><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f4f8;min-height:100vh;padding:20px 16px}
+#app{width:100%;max-width:960px;margin:0 auto;background:#fff;border-radius:10px;border:0.5px solid #d5dce6;padding:22px 26px}
+.mono{font-family:"SF Mono","Fira Code",Consolas,monospace}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.hdr-label{font-size:11px;color:#1a56db;letter-spacing:1.5px;margin-bottom:3px}
+.hdr-title{font-size:18px;font-weight:500;color:#0f1a2e}
+.hdr-sub{font-size:13px;color:#556275;margin-top:2px}
+.day-badge{background:#f4f6f9;border:0.5px solid #d5dce6;border-radius:6px;padding:5px 12px;text-align:right}
+.day-n{font-size:22px;font-weight:500;color:#1a56db}.day-sub{font-size:9px;color:#556275;margin-top:1px}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.sc-card{border:0.5px solid #d5dce6;border-radius:6px;padding:10px 12px;position:relative;overflow:hidden}
+.sc-stripe{position:absolute;left:0;top:0;bottom:0;width:3px}
+.sc-tag{font-size:10px;color:#556275;letter-spacing:0.5px;margin-bottom:2px}
+.sc-val{font-size:22px;font-weight:500;color:#0f1a2e}.sc-sub{font-size:10px;color:#556275;margin-top:2px}
+.tabs{display:flex;border-bottom:0.5px solid #d5dce6;margin-bottom:16px;overflow-x:auto}
+.tab{padding:7px 14px;font-size:12px;cursor:pointer;color:#556275;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-0.5px;white-space:nowrap}
+.tab.active{color:#1a56db;border-bottom-color:#1a56db}
+.panel{background:#f4f6f9;border:0.5px solid #d5dce6;border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.strip{background:#f4f6f9;border:0.5px solid #d5dce6;border-radius:4px;padding:6px 10px;margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font-size:11px;border:0.5px solid #d5dce6;background:#f4f6f9;color:#3a4a63;border-radius:4px;padding:4px 10px;cursor:pointer;transition:all .12s}
+.btn:hover{background:#e8eefb;border-color:#1a56db;color:#1a56db}
+.btn.active{background:#1a56db;color:#fff;border-color:#1a56db}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:right;padding:7px 10px;font-weight:500;color:#556275;font-size:10px;letter-spacing:0.3px;border-bottom:0.5px solid #d5dce6;background:#f8f9fb;position:sticky;top:0;z-index:1}
+th:first-child,th:nth-child(2){text-align:left}
+td{padding:6px 10px;border-bottom:0.5px solid #d5dce6;text-align:right;color:#0f1a2e}
+td:first-child,td:nth-child(2){text-align:left}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8faff}
+tr.bench td{color:#556275;font-style:italic}
+.up{color:#15803d}.dn{color:#b91c1c}.mu{color:#556275}
+.td{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.thesis-row{display:none}.thesis-row.open{display:table-row}
+.thesis-inner{padding:8px 12px 8px 28px;background:#f8faff;border-left:2px solid #1a56db}
+.tg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.tl{font-size:9px;color:#556275;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:2px}
+.tt{font-size:11px;color:#3a4a63;line-height:1.5}
+.inp{font-family:"SF Mono","Fira Code",monospace;font-size:11px;padding:3px 6px;border-radius:4px;border:0.5px solid #d5dce6;background:#fff;color:#0f1a2e;width:72px;text-align:right;outline:none;transition:border-color .12s}
+.inp:focus{border-color:#1a56db}.inp::placeholder{color:#b0bac8}
+.chart-wrap{position:relative;height:280px;margin-bottom:14px}
+.view{display:none}.view.active{display:block}
+.footer{margin-top:16px;padding-top:12px;border-top:0.5px solid #d5dce6;display:flex;justify-content:space-between;font-size:10px;color:#556275;flex-wrap:wrap;gap:8px}
+.toast{position:fixed;bottom:20px;right:20px;background:#fff;border:0.5px solid #d5dce6;border-radius:6px;padding:8px 14px;font-size:12px;color:#3a4a63;box-shadow:0 2px 8px rgba(0,0,0,.08);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:100}
+.toast.show{opacity:1;transform:translateY(0)}
+.bdg{display:inline-block;font-size:10px;padding:1px 7px;border-radius:3px;margin-left:5px}
+.bg{background:#e8f5e9;color:#15803d}
+.drop-zone{border:2px dashed #d5dce6;border-radius:6px;padding:20px;text-align:center;color:#556275;font-size:12px;cursor:pointer;transition:all .15s;margin-bottom:12px;display:block}
+.drop-zone:hover,.drop-zone.over{border-color:#1a56db;background:#f8faff;color:#1a56db}
+.ct-btn{font-size:10px;padding:3px 8px;border-radius:3px;cursor:pointer;border:0.5px solid #d5dce6;background:#fff;color:#556275;transition:all .12s;display:flex;align-items:center;gap:4px}
+.ct-btn:hover{border-color:#1a56db;color:#1a56db}
+.ct-btn.on{background:#e8eefb;border-color:#1a56db;color:#1a56db;font-weight:500}
+.mx-card{border:0.5px solid #d5dce6;border-radius:6px;padding:10px 14px;margin-bottom:6px;position:relative;overflow:hidden}
+.mx-stripe{position:absolute;left:0;top:0;bottom:0;width:3px}
+.mx-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.mx-tk{font-weight:500;font-size:13px}.mx-nm{color:#556275;font-size:11px;margin-left:6px}
+.mx-wt{font-size:12px;color:#1a56db}
+.mx-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:11px}
+.mx-lbl{font-size:9px;color:#556275;letter-spacing:0.6px;text-transform:uppercase;margin-bottom:2px}
+.mx-txt{color:#3a4a63;line-height:1.5}
+.date-bar{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.date-bar label{font-size:9px;color:#556275;letter-spacing:0.6px;text-transform:uppercase}
+.date-bar select{font-family:"SF Mono","Fira Code",monospace;font-size:11px;padding:3px 8px;border:0.5px solid #d5dce6;border-radius:4px;background:#fff;color:#0f1a2e}
+@media(max-width:768px){.sc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hdr{flex-direction:column;gap:8px}.chart-wrap{height:220px}.tg,.mx-body{grid-template-columns:1fr}}
+@media(max-width:480px){.sc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="hdr">
+  <div>
+    <div class="hdr-label mono">THRESHER FIXED</div>
+    <div class="hdr-title">Mythos Basket Tracker</div>
+    <div class="hdr-sub">AI infrastructure thematic — <span class="mono" style="color:#1a56db">22 names</span> · <span class="mono" style="color:#b45309">7 tiers</span> · $100K notional</div>
+    <div style="font-size:10px;color:#b45309;letter-spacing:.8px;margin-top:3px" class="mono">FOR INTERNAL USE ONLY · THRESHER FIXED LLC</div>
+  </div>
+  <div class="day-badge"><div style="font-size:10px;color:#556275">DAY</div><div class="day-n mono" id="day-count">3</div><div class="day-sub">since Mythos drop</div><div style="font-size:9px;color:#1a56db;margin-top:2px;cursor:pointer;text-decoration:underline" onclick="saveHTML()" title="Download with data baked in">⬇ save</div></div>
+</div>
+<div class="sc-grid" id="stats"><div class="sc-card"><div class="sc-stripe" style="background:#1a56db"></div><div class="sc-tag mono">BASKET P&amp;L</div><div class="sc-val mono up">$8,834</div><div class="sc-sub">on $100K notional</div></div><div class="sc-card"><div class="sc-stripe" style="background:#15803d"></div><div class="sc-tag mono">RETURN</div><div class="sc-val mono up">+8.83%</div></div><div class="sc-card"><div class="sc-stripe" style="background:#b45309"></div><div class="sc-tag mono">WTD RETURN</div><div class="sc-val mono up">+8.83%</div></div><div class="sc-card"><div class="sc-stripe" style="background:#475569"></div><div class="sc-tag mono">NAMES</div><div class="sc-val mono">21</div><div class="sc-sub">with prices</div></div><div class="sc-card"><div class="sc-stripe" style="background:#7c3aed"></div><div class="sc-tag mono">MKT VALUE</div><div class="sc-val mono">$108,834</div></div></div>
+<div class="strip" id="tier-filters"><button class="btn active" onclick="sF('all')">All</button><button class="btn " onclick="sF('Compute')"><span class="td" style="background:#1a56db"></span>Compute</button><button class="btn " onclick="sF('Foundry &amp; Equip')"><span class="td" style="background:#0f6e56"></span>Foundry &amp; Equip</button><button class="btn " onclick="sF('Memory')"><span class="td" style="background:#15803d"></span>Memory</button><button class="btn " onclick="sF('Networking')"><span class="td" style="background:#475569"></span>Networking</button><button class="btn " onclick="sF('Platform')"><span class="td" style="background:#b45309"></span>Platform</button><button class="btn " onclick="sF('Power &amp; Thermal')"><span class="td" style="background:#b91c1c"></span>Power &amp; Thermal</button><button class="btn " onclick="sF('Cyber')"><span class="td" style="background:#7c3aed"></span>Cyber</button><button class="btn " onclick="sF('Benchmark')"><span class="td" style="background:#a8b5c4"></span>Benchmark</button><span style="margin-left:auto;font-size:10px;color:#556275">click row → thesis</span></div>
+<div class="tabs">
+  <button class="tab active" onclick="sw('holdings',this)">Holdings</button>
+  <button class="tab" onclick="sw('matrix',this)">Thesis matrix</button>
+  <button class="tab" onclick="sw('chart',this)">Chart</button>
+  <button class="tab" onclick="sw('import',this)">Import</button>
+  <button class="tab" onclick="sw('settings',this)">Settings</button>
+</div>
+
+<div id="view-holdings" class="view active">
+  <div class="date-bar">
+    <div><label>Entry date</label><br><select id="h-entry-sel" onchange="applyHoldingDates()"><option value="0">4/10/2026</option><option value="1">4/9/2026</option><option value="2">4/8/2026</option><option value="3">4/7/2026</option><option value="4">4/6/2026</option><option value="5">4/2/2026</option><option value="6">4/1/2026</option><option value="7">3/31/2026</option><option value="8">3/30/2026</option><option value="9">3/27/2026</option><option value="10">3/26/2026</option><option value="11">3/25/2026</option><option value="12">3/24/2026</option><option value="13">3/23/2026</option><option value="14">3/20/2026</option><option value="15">3/19/2026</option><option value="16">3/18/2026</option><option value="17">3/17/2026</option><option value="18">3/16/2026</option><option value="19">3/13/2026</option><option value="20">3/12/2026</option><option value="21">3/11/2026</option><option value="22">3/10/2026</option><option value="23">3/9/2026</option><option value="24">3/6/2026</option><option value="25">3/5/2026</option><option value="26">3/4/2026</option><option value="27">3/3/2026</option><option value="28">3/2/2026</option><option value="29">2/27/2026</option><option value="30">2/26/2026</option><option value="31">2/25/2026</option><option value="32">2/24/2026</option><option value="33">2/23/2026</option><option value="34">2/20/2026</option><option value="35">2/19/2026</option><option value="36">2/18/2026</option><option value="37">2/17/2026</option><option value="38">2/13/2026</option><option value="39">2/12/2026</option><option value="40">2/11/2026</option><option value="41">2/10/2026</option><option value="42">2/9/2026</option><option value="43">2/6/2026</option><option value="44">2/5/2026</option><option value="45">2/4/2026</option><option value="46">2/3/2026</option><option value="47">2/2/2026</option><option value="48">1/30/2026</option><option value="49">1/29/2026</option><option value="50">1/28/2026</option><option value="51">1/27/2026</option><option value="52">1/26/2026</option><option value="53">1/23/2026</option><option value="54">1/22/2026</option><option value="55">1/21/2026</option><option value="56">1/20/2026</option><option value="57">1/16/2026</option><option value="58">1/15/2026</option><option value="59">1/14/2026</option><option value="60">1/13/2026</option><option value="61">1/12/2026</option><option value="62">1/9/2026</option><option value="63">1/8/2026</option><option value="64">1/7/2026</option><option value="65">1/6/2026</option><option value="66">1/5/2026</option><option value="67">1/2/2026</option><option value="68">12/31/2025</option><option value="69">12/30/2025</option><option value="70">12/29/2025</option><option value="71">12/26/2025</option><option value="72">12/24/2025</option><option value="73">12/23/2025</option><option value="74">12/22/2025</option><option value="75">12/19/2025</option><option value="76">12/18/2025</option><option value="77">12/17/2025</option><option value="78">12/16/2025</option></select></div>
+    <div><label>Current date</label><br><select id="h-current-sel" onchange="applyHoldingDates()"><option value="0">4/10/2026</option><option value="1">4/9/2026</option><option value="2">4/8/2026</option><option value="3">4/7/2026</option><option value="4">4/6/2026</option><option value="5">4/2/2026</option><option value="6">4/1/2026</option><option value="7">3/31/2026</option><option value="8">3/30/2026</option><option value="9">3/27/2026</option><option value="10">3/26/2026</option><option value="11">3/25/2026</option><option value="12">3/24/2026</option><option value="13">3/23/2026</option><option value="14">3/20/2026</option><option value="15">3/19/2026</option><option value="16">3/18/2026</option><option value="17">3/17/2026</option><option value="18">3/16/2026</option><option value="19">3/13/2026</option><option value="20">3/12/2026</option><option value="21">3/11/2026</option><option value="22">3/10/2026</option><option value="23">3/9/2026</option><option value="24">3/6/2026</option><option value="25">3/5/2026</option><option value="26">3/4/2026</option><option value="27">3/3/2026</option><option value="28">3/2/2026</option><option value="29">2/27/2026</option><option value="30">2/26/2026</option><option value="31">2/25/2026</option><option value="32">2/24/2026</option><option value="33">2/23/2026</option><option value="34">2/20/2026</option><option value="35">2/19/2026</option><option value="36">2/18/2026</option><option value="37">2/17/2026</option><option value="38">2/13/2026</option><option value="39">2/12/2026</option><option value="40">2/11/2026</option><option value="41">2/10/2026</option><option value="42">2/9/2026</option><option value="43">2/6/2026</option><option value="44">2/5/2026</option><option value="45">2/4/2026</option><option value="46">2/3/2026</option><option value="47">2/2/2026</option><option value="48">1/30/2026</option><option value="49">1/29/2026</option><option value="50">1/28/2026</option><option value="51">1/27/2026</option><option value="52">1/26/2026</option><option value="53">1/23/2026</option><option value="54">1/22/2026</option><option value="55">1/21/2026</option><option value="56">1/20/2026</option><option value="57">1/16/2026</option><option value="58">1/15/2026</option><option value="59">1/14/2026</option><option value="60">1/13/2026</option><option value="61">1/12/2026</option><option value="62">1/9/2026</option><option value="63">1/8/2026</option><option value="64">1/7/2026</option><option value="65">1/6/2026</option><option value="66">1/5/2026</option><option value="67">1/2/2026</option><option value="68">12/31/2025</option><option value="69">12/30/2025</option><option value="70">12/29/2025</option><option value="71">12/26/2025</option><option value="72">12/24/2025</option><option value="73">12/23/2025</option><option value="74">12/22/2025</option><option value="75">12/19/2025</option><option value="76">12/18/2025</option><option value="77">12/17/2025</option><option value="78">12/16/2025</option></select></div>
+    <div style="font-size:10px;color:#556275;margin-left:auto" id="date-status">79 dates loaded</div>
+  </div>
+  <div style="overflow-x:auto;border:0.5px solid #d5dce6;border-radius:6px">
+    <table><thead><tr>
+      <th style="width:24px"></th><th>Name</th><th style="text-align:right">Tier</th><th style="text-align:right">Wt</th>
+      <th style="text-align:right">Notional</th><th style="text-align:right">Entry</th><th style="text-align:right">Current</th><th style="text-align:right">Chg %</th>
+      <th style="text-align:right">P&amp;L $</th><th style="text-align:right">Wtd Ret</th>
+    </tr></thead><tbody id="tbody"><tr style="cursor: pointer;"><td><span class="td" style="background:#1a56db"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">NVDA</span> <span style="color:#556275;font-size:11px">NVIDIA</span></td><td style="text-align:right;font-size:10px;color:#556275">Compute</td><td style="text-align:right" class="mu mono">12%</td><td style="text-align:right" class="mu mono">$12,000</td><td style="text-align:right"><input class="inp" value="178.09" placeholder="—" data-i="0" data-f="entry"></td><td style="text-align:right"><input class="inp" value="188.15" placeholder="—" data-i="0" data-f="current"></td><td style="text-align:right" class="up mono">+5.65%</td><td style="text-align:right" class="up mono">$678</td><td style="text-align:right" class="up mono">+0.68%</td></tr><tr id="r-NVDA" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Glasswing partner. Inference GPUs for agentic security workloads. Flat YTD vs sector +25% = relative value.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings May 20. Agentic inference demand not in estimates.</div></div><div><div class="tl">Risk</div><div class="tt">Custom silicon from AMZN/GOOGL eroding share 3-5yr.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#1a56db"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">AVGO</span> <span style="color:#556275;font-size:11px">Broadcom</span></td><td style="text-align:right;font-size:10px;color:#556275">Compute</td><td style="text-align:right" class="mu mono">8%</td><td style="text-align:right" class="mu mono">$8,000</td><td style="text-align:right"><input class="inp" value="333.85" placeholder="—" data-i="1" data-f="entry"></td><td style="text-align:right"><input class="inp" value="371.58" placeholder="—" data-i="1" data-f="current"></td><td style="text-align:right" class="up mono">+11.30%</td><td style="text-align:right" class="up mono">$904</td><td style="text-align:right" class="up mono">+0.90%</td></tr><tr id="r-AVGO" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Glasswing partner. Custom ASIC + networking silicon for hyperscaler security infra.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings Jun. Networking + custom AI chip demand.</div></div><div><div class="tl">Risk</div><div class="tt">Customer concentration in hyperscalers.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#1a56db"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">AMD</span> <span style="color:#556275;font-size:11px">AMD</span></td><td style="text-align:right;font-size:10px;color:#556275">Compute</td><td style="text-align:right" class="mu mono">5%</td><td style="text-align:right" class="mu mono">$5,000</td><td style="text-align:right"><input class="inp" value="221.43" placeholder="—" data-i="2" data-f="entry"></td><td style="text-align:right"><input class="inp" value="245.10" placeholder="—" data-i="2" data-f="current"></td><td style="text-align:right" class="up mono">+10.69%</td><td style="text-align:right" class="up mono">$534</td><td style="text-align:right" class="up mono">+0.53%</td></tr><tr id="r-AMD" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">MI300X gaining inference share. Diversification from NVDA single-supplier risk.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings Apr 29. ROCm ecosystem maturation.</div></div><div><div class="tl">Risk</div><div class="tt">Perpetual #2. CUDA moat may be durable.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#0f6e56"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">TSM</span> <span style="color:#556275;font-size:11px">TSMC</span></td><td style="text-align:right;font-size:10px;color:#556275">Foundry &amp; Equip</td><td style="text-align:right" class="mu mono">4%</td><td style="text-align:right" class="mu mono">$4,000</td><td style="text-align:right"><input class="inp" value="345.11" placeholder="—" data-i="3" data-f="entry"></td><td style="text-align:right"><input class="inp" value="369.89" placeholder="—" data-i="3" data-f="current"></td><td style="text-align:right" class="up mono">+7.18%</td><td style="text-align:right" class="up mono">$287</td><td style="text-align:right" class="up mono">+0.29%</td></tr><tr id="r-TSM" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Every AI chip fabricated here. Single point of failure for entire AI hardware stack. ~20x fwd earnings.</div></div><div><div class="tl">Catalyst</div><div class="tt">N7/N5/N3 capacity expansion for AI accelerators.</div></div><div><div class="tl">Risk</div><div class="tt">Taiwan geopolitical concentration risk.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#0f6e56"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">ASML</span> <span style="color:#556275;font-size:11px">ASML</span></td><td style="text-align:right;font-size:10px;color:#556275">Foundry &amp; Equip</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="1303.30" placeholder="—" data-i="4" data-f="entry"></td><td style="text-align:right"><input class="inp" value="1478.04" placeholder="—" data-i="4" data-f="current"></td><td style="text-align:right" class="up mono">+13.41%</td><td style="text-align:right" class="up mono">$402</td><td style="text-align:right" class="up mono">+0.40%</td></tr><tr id="r-ASML" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">EUV lithography monopoly. Every new fab requires ASML machines. No alternative supplier.</div></div><div><div class="tl">Catalyst</div><div class="tt">Multi-year order book. High-NA EUV ramp.</div></div><div><div class="tl">Risk</div><div class="tt">Cyclical capex risk. China export restrictions.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#0f6e56"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">LRCX</span> <span style="color:#556275;font-size:11px">Lam Research</span></td><td style="text-align:right;font-size:10px;color:#556275">Foundry &amp; Equip</td><td style="text-align:right" class="mu mono">2%</td><td style="text-align:right" class="mu mono">$2,000</td><td style="text-align:right"><input class="inp" value="224.24" placeholder="—" data-i="5" data-f="entry"></td><td style="text-align:right"><input class="inp" value="263.52" placeholder="—" data-i="5" data-f="current"></td><td style="text-align:right" class="up mono">+17.52%</td><td style="text-align:right" class="up mono">$350</td><td style="text-align:right" class="up mono">+0.35%</td></tr><tr id="r-LRCX" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Etch/deposition for advanced memory + logic nodes. Critical to HBM stacking.</div></div><div><div class="tl">Catalyst</div><div class="tt">Memory fab expansion cycle 2026-2028.</div></div><div><div class="tl">Risk</div><div class="tt">Cyclical equipment demand.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#15803d"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">EWY</span> <span style="color:#556275;font-size:11px">iShares Korea</span></td><td style="text-align:right;font-size:10px;color:#556275">Memory</td><td style="text-align:right" class="mu mono">10%</td><td style="text-align:right" class="mu mono">$10,000</td><td style="text-align:right"><input class="inp" value="127.19" placeholder="—" data-i="6" data-f="entry"></td><td style="text-align:right"><input class="inp" value="138.67" placeholder="—" data-i="6" data-f="current"></td><td style="text-align:right" class="up mono">+9.03%</td><td style="text-align:right" class="up mono">$903</td><td style="text-align:right" class="up mono">+0.90%</td></tr><tr id="r-EWY" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">~33% Samsung + SK Hynix. 90% global HBM monopoly. Memory supercycle. DRAM +40-50%.</div></div><div><div class="tl">Catalyst</div><div class="tt">HBM4 mass production. Server DRAM price surge.</div></div><div><div class="tl">Risk</div><div class="tt">Korea geopolitical concentration.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#15803d"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">MU</span> <span style="color:#556275;font-size:11px">Micron</span></td><td style="text-align:right;font-size:10px;color:#556275">Memory</td><td style="text-align:right" class="mu mono">7%</td><td style="text-align:right" class="mu mono">$7,000</td><td style="text-align:right"><input class="inp" value="377.55" placeholder="—" data-i="7" data-f="entry"></td><td style="text-align:right"><input class="inp" value="420.16" placeholder="—" data-i="7" data-f="current"></td><td style="text-align:right" class="up mono">+11.29%</td><td style="text-align:right" class="up mono">$790</td><td style="text-align:right" class="up mono">+0.79%</td></tr><tr id="r-MU" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">US-listed HBM exposure. HBM3E/HBM4 supply sold out through 2026.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings Jun. HBM revenue mix shift.</div></div><div><div class="tl">Risk</div><div class="tt">Commodity DRAM cycle. China legacy competition.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#15803d"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">AMAT</span> <span style="color:#556275;font-size:11px">Applied Materials</span></td><td style="text-align:right;font-size:10px;color:#556275">Memory</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="354.20" placeholder="—" data-i="8" data-f="entry"></td><td style="text-align:right"><input class="inp" value="399.05" placeholder="—" data-i="8" data-f="current"></td><td style="text-align:right" class="up mono">+12.66%</td><td style="text-align:right" class="up mono">$380</td><td style="text-align:right" class="up mono">+0.38%</td></tr><tr id="r-AMAT" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Largest semi equipment name. Etch/deposition/CMP for memory fab expansion.</div></div><div><div class="tl">Catalyst</div><div class="tt">New fab construction cycle 2026-2028.</div></div><div><div class="tl">Risk</div><div class="tt">Cyclical capex if AI spending slows.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#475569"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">ANET</span> <span style="color:#556275;font-size:11px">Arista Networks</span></td><td style="text-align:right;font-size:10px;color:#556275">Networking</td><td style="text-align:right" class="mu mono">5%</td><td style="text-align:right" class="mu mono">$5,000</td><td style="text-align:right"><input class="inp" value="133.58" placeholder="—" data-i="9" data-f="entry"></td><td style="text-align:right"><input class="inp" value="147.74" placeholder="—" data-i="9" data-f="current"></td><td style="text-align:right" class="up mono">+10.60%</td><td style="text-align:right" class="up mono">$530</td><td style="text-align:right" class="up mono">+0.53%</td></tr><tr id="r-ANET" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">AI data center networking backbone. Every agentic workload is a network packet.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings May. 400G/800G upgrade cycle.</div></div><div><div class="tl">Risk</div><div class="tt">Cisco/Juniper competition.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#475569"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">COHR</span> <span style="color:#556275;font-size:11px">Coherent</span></td><td style="text-align:right;font-size:10px;color:#556275">Networking</td><td style="text-align:right" class="mu mono">4%</td><td style="text-align:right" class="mu mono">$4,000</td><td style="text-align:right"><input class="inp" value="254.95" placeholder="—" data-i="10" data-f="entry"></td><td style="text-align:right"><input class="inp" value="306.49" placeholder="—" data-i="10" data-f="current"></td><td style="text-align:right" class="up mono">+20.22%</td><td style="text-align:right" class="up mono">$809</td><td style="text-align:right" class="up mono">+0.81%</td></tr><tr id="r-COHR" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Optical transceivers for AI clusters. Bandwidth is the binding constraint.</div></div><div><div class="tl">Catalyst</div><div class="tt">800G/1.6T transceiver ramp.</div></div><div><div class="tl">Risk</div><div class="tt">Execution risk on product transitions.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#475569"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">LITE</span> <span style="color:#556275;font-size:11px">Lumentum</span></td><td style="text-align:right;font-size:10px;color:#556275">Networking</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="814.82" placeholder="—" data-i="11" data-f="entry"></td><td style="text-align:right"><input class="inp" value="894.91" placeholder="—" data-i="11" data-f="current"></td><td style="text-align:right" class="up mono">+9.83%</td><td style="text-align:right" class="up mono">$295</td><td style="text-align:right" class="up mono">+0.29%</td></tr><tr id="r-LITE" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">800G/1.6T optics. Capacity booked through 2028. NVDA-backed $2B expansion.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings May 5. CEO: demand has no end in sight.</div></div><div><div class="tl">Risk</div><div class="tt">273x P/E. Priced for perfection.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#475569"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">CSCO</span> <span style="color:#556275;font-size:11px">Cisco</span></td><td style="text-align:right;font-size:10px;color:#556275">Networking</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="80.70" placeholder="—" data-i="12" data-f="entry"></td><td style="text-align:right"><input class="inp" value="82.19" placeholder="—" data-i="12" data-f="current"></td><td style="text-align:right" class="up mono">+1.85%</td><td style="text-align:right" class="up mono">$55</td><td style="text-align:right" class="up mono">+0.06%</td></tr><tr id="r-CSCO" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Glasswing founding partner. Splunk = security + observability. Value at ~13x.</div></div><div><div class="tl">Catalyst</div><div class="tt">Integration execution. Federal security contracts.</div></div><div><div class="tl">Risk</div><div class="tt">Legacy reputation. Slow growth perception.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#475569"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">FN</span> <span style="color:#556275;font-size:11px">Fabrinet</span></td><td style="text-align:right;font-size:10px;color:#556275">Networking</td><td style="text-align:right" class="mu mono">2%</td><td style="text-align:right" class="mu mono">$2,000</td><td style="text-align:right"><input class="inp" value="557.86" placeholder="—" data-i="13" data-f="entry"></td><td style="text-align:right"><input class="inp" value="660.00" placeholder="—" data-i="13" data-f="current"></td><td style="text-align:right" class="up mono">+18.31%</td><td style="text-align:right" class="up mono">$366</td><td style="text-align:right" class="up mono">+0.37%</td></tr><tr id="r-FN" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Contract mfr for LITE/COHR/CSCO optics. Foxconn of photonics. SiPh ramp for AI switches.</div></div><div><div class="tl">Catalyst</div><div class="tt">Q3 rev guide $1.15-1.20B. 1.6T transceiver ramp.</div></div><div><div class="tl">Risk</div><div class="tt">Customer concentration. Thailand mfg risk.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#b45309"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">AMZN</span> <span style="color:#556275;font-size:11px">Amazon</span></td><td style="text-align:right;font-size:10px;color:#556275">Platform</td><td style="text-align:right" class="mu mono">6%</td><td style="text-align:right" class="mu mono">$6,000</td><td style="text-align:right"><input class="inp" value="213.77" placeholder="—" data-i="14" data-f="entry"></td><td style="text-align:right"><input class="inp" value="238.18" placeholder="—" data-i="14" data-f="current"></td><td style="text-align:right" class="up mono">+11.42%</td><td style="text-align:right" class="up mono">$685</td><td style="text-align:right" class="up mono">+0.69%</td></tr><tr id="r-AMZN" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">AWS = Anthropic primary cloud. Bedrock = Mythos distribution channel. $200B capex 2026.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings Apr 24. Bedrock/Claude enterprise adoption.</div></div><div><div class="tl">Risk</div><div class="tt">Antitrust. AWS margin pressure.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#b45309"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">GOOGL</span> <span style="color:#556275;font-size:11px">Alphabet</span></td><td style="text-align:right;font-size:10px;color:#556275">Platform</td><td style="text-align:right" class="mu mono">4%</td><td style="text-align:right" class="mu mono">$4,000</td><td style="text-align:right"><input class="inp" value="305.41" placeholder="—" data-i="15" data-f="entry"></td><td style="text-align:right"><input class="inp" value="317.19" placeholder="—" data-i="15" data-f="current"></td><td style="text-align:right" class="up mono">+3.86%</td><td style="text-align:right" class="up mono">$154</td><td style="text-align:right" class="up mono">+0.15%</td></tr><tr id="r-GOOGL" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">1M+ TPU partnership with Anthropic. Vertex AI distribution. Own models + distributes Anthropic.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings Apr 24. Cloud AI revenue growth.</div></div><div><div class="tl">Risk</div><div class="tt">Search disruption. DOJ antitrust.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#b91c1c"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">VST</span> <span style="color:#556275;font-size:11px">Vistra</span></td><td style="text-align:right;font-size:10px;color:#556275">Power &amp; Thermal</td><td style="text-align:right" class="mu mono">4%</td><td style="text-align:right" class="mu mono">$4,000</td><td style="text-align:right"><input class="inp" value="153.69" placeholder="—" data-i="16" data-f="entry"></td><td style="text-align:right"><input class="inp" value="154.25" placeholder="—" data-i="16" data-f="current"></td><td style="text-align:right" class="up mono">+0.36%</td><td style="text-align:right" class="up mono">$15</td><td style="text-align:right" class="up mono">+0.01%</td></tr><tr id="r-VST" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Nuclear + gas fleet. Always-on agentic workloads = always-on baseload power demand.</div></div><div><div class="tl">Catalyst</div><div class="tt">PPA announcements with hyperscalers.</div></div><div><div class="tl">Risk</div><div class="tt">Regulatory. Nuclear sentiment shifts.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#b91c1c"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">VRT</span> <span style="color:#556275;font-size:11px">Vertiv</span></td><td style="text-align:right;font-size:10px;color:#556275">Power &amp; Thermal</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="262.26" placeholder="—" data-i="17" data-f="entry"></td><td style="text-align:right"><input class="inp" value="294.90" placeholder="—" data-i="17" data-f="current"></td><td style="text-align:right" class="up mono">+12.45%</td><td style="text-align:right" class="up mono">$373</td><td style="text-align:right" class="up mono">+0.37%</td></tr><tr id="r-VRT" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Liquid cooling + power mgmt for AI racks. NVDA partnership. $15B backlog. S&amp;P 500 add Mar 2026.</div></div><div><div class="tl">Catalyst</div><div class="tt">Earnings. System-level orders expanding margins.</div></div><div><div class="tl">Risk</div><div class="tt">64% YTD run. Execution on backlog conversion.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#b91c1c"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">BE</span> <span style="color:#556275;font-size:11px">Bloom Energy</span></td><td style="text-align:right;font-size:10px;color:#556275">Power &amp; Thermal</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="135.85" placeholder="—" data-i="18" data-f="entry"></td><td style="text-align:right"><input class="inp" value="166.56" placeholder="—" data-i="18" data-f="current"></td><td style="text-align:right" class="up mono">+22.61%</td><td style="text-align:right" class="up mono">$678</td><td style="text-align:right" class="up mono">+0.68%</td></tr><tr id="r-BE" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Behind-the-meter fuel cells. Bypass grid bottleneck. Deploy in months not years.</div></div><div><div class="tl">Catalyst</div><div class="tt">Revenue $3.1-3.3B guide (+60%). Backlog $20B.</div></div><div><div class="tl">Risk</div><div class="tt">125x forward. 60% mfg scale-up execution.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#b91c1c"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">CEG</span> <span style="color:#556275;font-size:11px">Constellation</span></td><td style="text-align:right;font-size:10px;color:#556275">Power &amp; Thermal</td><td style="text-align:right" class="mu mono">3%</td><td style="text-align:right" class="mu mono">$3,000</td><td style="text-align:right"><input class="inp" value="272.51" placeholder="—" data-i="19" data-f="entry"></td><td style="text-align:right"><input class="inp" value="285.55" placeholder="—" data-i="19" data-f="current"></td><td style="text-align:right" class="up mono">+4.79%</td><td style="text-align:right" class="up mono">$144</td><td style="text-align:right" class="up mono">+0.14%</td></tr><tr id="r-CEG" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Largest US nuclear fleet. 24/7 carbon-free for hyperscalers.</div></div><div><div class="tl">Catalyst</div><div class="tt">Crane Clean Energy Center restart. MSFT PPA.</div></div><div><div class="tl">Risk</div><div class="tt">Regulatory approval for restarts.</div></div></div></div></td></tr><tr style="cursor: pointer;"><td><span class="td" style="background:#7c3aed"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">PANW</span> <span style="color:#556275;font-size:11px">Palo Alto</span></td><td style="text-align:right;font-size:10px;color:#556275">Cyber</td><td style="text-align:right" class="mu mono">6%</td><td style="text-align:right" class="mu mono">$6,000</td><td style="text-align:right"><input class="inp" value="169.87" placeholder="—" data-i="20" data-f="entry"></td><td style="text-align:right"><input class="inp" value="155.75" placeholder="—" data-i="20" data-f="current"></td><td style="text-align:right" class="dn mono">-8.31%</td><td style="text-align:right" class="dn mono">($499)</td><td style="text-align:right" class="dn mono">-0.50%</td></tr><tr id="r-PANW" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Glasswing partner. CyberArk = identity security Mythos cant replace. Koi acq for AI agent security.</div></div><div><div class="tl">Catalyst</div><div class="tt">CyberArk close H2 2026. CEO buying stock on dip.</div></div><div><div class="tl">Risk</div><div class="tt">Integration execution. 96x trailing P/E.</div></div></div></div></td></tr><tr class="bench" style="cursor: pointer;"><td><span class="td" style="background:#a8b5c4"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">QQQ</span> <span style="color:#556275;font-size:11px">Nasdaq 100 ETF</span></td><td style="text-align:right;font-size:10px;color:#556275">Benchmark</td><td style="text-align:right" class="mu mono">—</td><td style="text-align:right" class="mu mono">—</td><td style="text-align:right"><input class="inp" value="588.67" placeholder="—" data-i="21" data-f="entry"></td><td style="text-align:right"><input class="inp" value="610.51" placeholder="—" data-i="21" data-f="current"></td><td style="text-align:right" class="up mono">+3.71%</td><td style="text-align:right" class="mu mono">—</td><td style="text-align:right" class="mu mono">—</td></tr><tr id="r-QQQ" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Broad tech benchmark.</div></div><div><div class="tl">Catalyst</div><div class="tt">N/A</div></div><div><div class="tl">Risk</div><div class="tt">N/A</div></div></div></div></td></tr><tr class="bench" style="cursor: pointer;"><td><span class="td" style="background:#a8b5c4"></span></td><td><span class="mono" style="font-weight:500;font-size:12px">SOXX</span> <span style="color:#556275;font-size:11px">Semi ETF</span></td><td style="text-align:right;font-size:10px;color:#556275">Benchmark</td><td style="text-align:right" class="mu mono">—</td><td style="text-align:right" class="mu mono">—</td><td style="text-align:right"><input class="inp" value="347.68" placeholder="—" data-i="22" data-f="entry"></td><td style="text-align:right"><input class="inp" value="386.21" placeholder="—" data-i="22" data-f="current"></td><td style="text-align:right" class="up mono">+11.08%</td><td style="text-align:right" class="mu mono">—</td><td style="text-align:right" class="mu mono">—</td></tr><tr id="r-SOXX" class="thesis-row"><td colspan="10"><div class="thesis-inner"><div class="tg"><div><div class="tl">Thesis</div><div class="tt">Semi sector benchmark. Tracks broadening vs NVDA.</div></div><div><div class="tl">Catalyst</div><div class="tt">N/A</div></div><div><div class="tl">Risk</div><div class="tt">N/A</div></div></div></div></td></tr></tbody></table>
+  </div>
+</div>
+
+<div id="view-matrix" class="view"><div id="matrix-cards"></div></div>
+
+<div id="view-chart" class="view">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:11px;color:#3a4a63;letter-spacing:0.5px;font-weight:500">RETURNS BY NAME</div>
+      <div style="display:flex;gap:5px">
+        <button class="btn" onclick="cAll()" style="font-size:10px;padding:3px 8px">All</button>
+        <button class="btn" onclick="cNone()" style="font-size:10px;padding:3px 8px">None</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px" id="ct"></div>
+    <div class="chart-wrap" style="height:420px"><canvas id="barC"></canvas></div>
+  </div>
+  <div class="panel">
+    <div style="font-size:11px;color:#3a4a63;letter-spacing:0.5px;font-weight:500;margin-bottom:10px">TIER ALLOCATION</div>
+    <div class="chart-wrap"><canvas id="tierC"></canvas></div>
+  </div>
+</div>
+
+<div id="view-import" class="view">
+  <div class="panel">
+    <div style="font-size:11px;color:#3a4a63;letter-spacing:0.5px;font-weight:500;margin-bottom:10px">IMPORT PRICE HISTORY</div>
+    <label class="drop-zone" id="dz" for="cf-input">
+      <input type="file" id="cf-input" accept=".csv,.tsv,.txt" style="display:none">
+      Drop CSV here or click to browse
+    </label>
+    <div style="font-size:10px;color:#556275;line-height:1.7">
+      <strong>Format:</strong> Tickers as columns, dates as rows. First column = date. Your Excel export.
+    </div>
+    <div id="il" style="margin-top: 12px; font-size: 11px; color: rgb(85, 98, 117); display: block;"><span class="up">79 dates · 23 tickers matched</span></div>
+  </div>
+</div>
+
+<div id="view-settings" class="view">
+  <div class="panel">
+    <div style="font-size:11px;color:#3a4a63;letter-spacing:0.5px;font-weight:500;margin-bottom:10px">BASKET BASE</div>
+    <div style="font-size:12px;color:#0f1a2e">Notional: <span class="mono" style="color:#1a56db">$100,000</span></div>
+    <div style="font-size:10px;color:#556275;margin-top:4px">Each name allocated by weight %. P&amp;L calculated on notional shares at entry price.</div>
+  </div>
+  <div class="panel">
+    <div style="font-size:11px;color:#3a4a63;letter-spacing:0.5px;font-weight:500;margin-bottom:10px">DATA</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" onclick="xCSV()">Export CSV</button>
+      <button class="btn" onclick="clrP()" style="color:#b45309;border-color:#fcd34d">Clear prices</button>
+      <button class="btn" onclick="clrA()" style="color:#b91c1c;border-color:#fca5a5">Reset all</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer"><span>Mythos Basket v2.1 · $100K notional · 22 names + 2 benchmarks</span><span id="ts" class="mono">Apr 10, 2026, 04:16 PM</span></div>
+</div>
+<div class="toast" id="toast">79 dates loaded</div>
+<script>
+var BASE=100000;
+var DI='2026-04-07';
+var T={Compute:{c:'#1a56db',w:25},'Foundry & Equip':{c:'#0f6e56',w:9},Memory:{c:'#15803d',w:20},Networking:{c:'#475569',w:17},Platform:{c:'#b45309',w:10},'Power & Thermal':{c:'#b91c1c',w:13},Cyber:{c:'#7c3aed',w:6},Benchmark:{c:'#a8b5c4',w:0}};
+var D=[
+{k:'NVDA',n:'NVIDIA',t:'Compute',w:12,th:'Glasswing partner. Inference GPUs for agentic security workloads. Flat YTD vs sector +25% = relative value.',ca:'Earnings May 20. Agentic inference demand not in estimates.',ri:'Custom silicon from AMZN/GOOGL eroding share 3-5yr.'},
+{k:'AVGO',n:'Broadcom',t:'Compute',w:8,th:'Glasswing partner. Custom ASIC + networking silicon for hyperscaler security infra.',ca:'Earnings Jun. Networking + custom AI chip demand.',ri:'Customer concentration in hyperscalers.'},
+{k:'AMD',n:'AMD',t:'Compute',w:5,th:'MI300X gaining inference share. Diversification from NVDA single-supplier risk.',ca:'Earnings Apr 29. ROCm ecosystem maturation.',ri:'Perpetual #2. CUDA moat may be durable.'},
+{k:'TSM',n:'TSMC',t:'Foundry & Equip',w:4,th:'Every AI chip fabricated here. Single point of failure for entire AI hardware stack. ~20x fwd earnings.',ca:'N7/N5/N3 capacity expansion for AI accelerators.',ri:'Taiwan geopolitical concentration risk.'},
+{k:'ASML',n:'ASML',t:'Foundry & Equip',w:3,th:'EUV lithography monopoly. Every new fab requires ASML machines. No alternative supplier.',ca:'Multi-year order book. High-NA EUV ramp.',ri:'Cyclical capex risk. China export restrictions.'},
+{k:'LRCX',n:'Lam Research',t:'Foundry & Equip',w:2,th:'Etch/deposition for advanced memory + logic nodes. Critical to HBM stacking.',ca:'Memory fab expansion cycle 2026-2028.',ri:'Cyclical equipment demand.'},
+{k:'EWY',n:'iShares Korea',t:'Memory',w:10,th:'~33% Samsung + SK Hynix. 90% global HBM monopoly. Memory supercycle. DRAM +40-50%.',ca:'HBM4 mass production. Server DRAM price surge.',ri:'Korea geopolitical concentration.'},
+{k:'MU',n:'Micron',t:'Memory',w:7,th:'US-listed HBM exposure. HBM3E/HBM4 supply sold out through 2026.',ca:'Earnings Jun. HBM revenue mix shift.',ri:'Commodity DRAM cycle. China legacy competition.'},
+{k:'AMAT',n:'Applied Materials',t:'Memory',w:3,th:'Largest semi equipment name. Etch/deposition/CMP for memory fab expansion.',ca:'New fab construction cycle 2026-2028.',ri:'Cyclical capex if AI spending slows.'},
+{k:'ANET',n:'Arista Networks',t:'Networking',w:5,th:'AI data center networking backbone. Every agentic workload is a network packet.',ca:'Earnings May. 400G/800G upgrade cycle.',ri:'Cisco/Juniper competition.'},
+{k:'COHR',n:'Coherent',t:'Networking',w:4,th:'Optical transceivers for AI clusters. Bandwidth is the binding constraint.',ca:'800G/1.6T transceiver ramp.',ri:'Execution risk on product transitions.'},
+{k:'LITE',n:'Lumentum',t:'Networking',w:3,th:'800G/1.6T optics. Capacity booked through 2028. NVDA-backed $2B expansion.',ca:'Earnings May 5. CEO: demand has no end in sight.',ri:'273x P/E. Priced for perfection.'},
+{k:'CSCO',n:'Cisco',t:'Networking',w:3,th:'Glasswing founding partner. Splunk = security + observability. Value at ~13x.',ca:'Integration execution. Federal security contracts.',ri:'Legacy reputation. Slow growth perception.'},
+{k:'FN',n:'Fabrinet',t:'Networking',w:2,th:'Contract mfr for LITE/COHR/CSCO optics. Foxconn of photonics. SiPh ramp for AI switches.',ca:'Q3 rev guide $1.15-1.20B. 1.6T transceiver ramp.',ri:'Customer concentration. Thailand mfg risk.'},
+{k:'AMZN',n:'Amazon',t:'Platform',w:6,th:'AWS = Anthropic primary cloud. Bedrock = Mythos distribution channel. $200B capex 2026.',ca:'Earnings Apr 24. Bedrock/Claude enterprise adoption.',ri:'Antitrust. AWS margin pressure.'},
+{k:'GOOGL',n:'Alphabet',t:'Platform',w:4,th:'1M+ TPU partnership with Anthropic. Vertex AI distribution. Own models + distributes Anthropic.',ca:'Earnings Apr 24. Cloud AI revenue growth.',ri:'Search disruption. DOJ antitrust.'},
+{k:'VST',n:'Vistra',t:'Power & Thermal',w:4,th:'Nuclear + gas fleet. Always-on agentic workloads = always-on baseload power demand.',ca:'PPA announcements with hyperscalers.',ri:'Regulatory. Nuclear sentiment shifts.'},
+{k:'VRT',n:'Vertiv',t:'Power & Thermal',w:3,th:'Liquid cooling + power mgmt for AI racks. NVDA partnership. $15B backlog. S&P 500 add Mar 2026.',ca:'Earnings. System-level orders expanding margins.',ri:'64% YTD run. Execution on backlog conversion.'},
+{k:'BE',n:'Bloom Energy',t:'Power & Thermal',w:3,th:'Behind-the-meter fuel cells. Bypass grid bottleneck. Deploy in months not years.',ca:'Revenue $3.1-3.3B guide (+60%). Backlog $20B.',ri:'125x forward. 60% mfg scale-up execution.'},
+{k:'CEG',n:'Constellation',t:'Power & Thermal',w:3,th:'Largest US nuclear fleet. 24/7 carbon-free for hyperscalers.',ca:'Crane Clean Energy Center restart. MSFT PPA.',ri:'Regulatory approval for restarts.'},
+{k:'PANW',n:'Palo Alto',t:'Cyber',w:6,th:'Glasswing partner. CyberArk = identity security Mythos cant replace. Koi acq for AI agent security.',ca:'CyberArk close H2 2026. CEO buying stock on dip.',ri:'Integration execution. 96x trailing P/E.'},
+{k:'QQQ',n:'Nasdaq 100 ETF',t:'Benchmark',w:0,th:'Broad tech benchmark.',ca:'N/A',ri:'N/A'},
+{k:'SOXX',n:'Semi ETF',t:'Benchmark',w:0,th:'Semi sector benchmark. Tracks broadening vs NVDA.',ca:'N/A',ri:'N/A'}
+];
+D.forEach(function(d){d.entry=null;d.current=null});
+var aF='all',cV={};D.forEach(function(d){cV[d.k]=true});
+var csvData=null;
+
+function tS(){return new Date().toISOString().slice(0,10)}
+function ld(){
+  var s=localStorage.getItem('m4');
+  if(s){JSON.parse(s).forEach(function(x){var d=D.find(function(z){return z.k===x.k});if(d){d.entry=x.entry;d.current=x.current}})}
+  var v=localStorage.getItem('m4cv');if(v)cV=JSON.parse(v);
+}
+function sv(){
+  localStorage.setItem('m4',JSON.stringify(D.map(function(d){return{k:d.k,entry:d.entry,current:d.current}})));
+  localStorage.setItem('m4cv',JSON.stringify(cV));
+}
+function f$(v){if(v==null||isNaN(v))return'—';var s=v<0;return(s?'(':'')+'$'+Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0})+(s?')':'')}
+function fP(v){if(v==null||isNaN(v))return'—';return(v>=0?'+':'')+v.toFixed(2)+'%'}
+function fp(v){return v==null?'':v.toFixed(2)}
+function cl(v){return v>0?'up':v<0?'dn':'mu'}
+function cDays(){
+  var ed=document.getElementById('h-entry-sel');
+  var cd=document.getElementById('h-current-sel');
+  var eText=ed.selectedIndex>=0?ed.options[ed.selectedIndex].text:'';
+  var cText=cd.selectedIndex>=0?cd.options[cd.selectedIndex].text:'';
+  if(!eText&&!cText)return Math.max(0,Math.floor((new Date()-new Date('2026-04-07'))/864e5));
+  function parseD(s){
+    if(!s)return new Date();
+    var p=s.split('/');
+    if(p.length===3)return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0'));
+    return new Date(s);
+  }
+  var eDate=eText?parseD(eText):new Date('2026-04-07');
+  var cDate=cText?parseD(cText):new Date();
+  return Math.max(0,Math.floor((cDate-eDate)/864e5));
+}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},2200)}
+function sw(id,el){document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active')});document.getElementById('view-'+id).classList.add('active');document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});if(el)el.classList.add('active');if(id==='chart')rCharts();if(id==='matrix')rMatrix();if(id==='holdings')resetHoldingDates()}
+
+function render(){
+  document.getElementById('day-count').textContent=cDays();
+  var tPnl=0,tWtd=0,names=0;
+  var tb=document.getElementById('tbody');tb.innerHTML='';
+  D.forEach(function(d,i){
+    if(aF!=='all'&&d.t!==aF)return;
+    var ib=d.t==='Benchmark',tc=T[d.t]?T[d.t].c:'#a8b5c4';
+    var notional=ib?0:BASE*d.w/100;
+    var pct=null,pnl=null,wtd=null,shares=null;
+    if(d.entry&&d.current){
+      pct=((d.current-d.entry)/d.entry)*100;
+      if(!ib&&d.entry>0){
+        shares=notional/d.entry;
+        pnl=(d.current-d.entry)*shares;
+        wtd=(d.w/100)*pct;
+      }
+    }
+    if(!ib&&pnl!=null){tPnl+=pnl;tWtd+=wtd;names++}
+    var tr=document.createElement('tr');if(ib)tr.className='bench';tr.style.cursor='pointer';
+    tr.onclick=function(e){if(e.target.tagName==='INPUT')return;document.getElementById('r-'+d.k).classList.toggle('open')};
+    tr.innerHTML='<td><span class="td" style="background:'+tc+'"></span></td>'+
+      '<td><span class="mono" style="font-weight:500;font-size:12px">'+d.k+'</span> <span style="color:#556275;font-size:11px">'+d.n+'</span></td>'+
+      '<td style="text-align:right;font-size:10px;color:#556275">'+d.t+'</td>'+
+      '<td style="text-align:right" class="mu mono">'+(ib?'—':d.w+'%')+'</td>'+
+      '<td style="text-align:right" class="mu mono">'+(ib?'—':f$(notional))+'</td>'+
+      '<td style="text-align:right"><input class="inp" value="'+fp(d.entry)+'" placeholder="—" data-i="'+i+'" data-f="entry"/></td>'+
+      '<td style="text-align:right"><input class="inp" value="'+fp(d.current)+'" placeholder="—" data-i="'+i+'" data-f="current"/></td>'+
+      '<td style="text-align:right" class="'+cl(pct)+' mono">'+fP(pct)+'</td>'+
+      '<td style="text-align:right" class="'+cl(pnl)+' mono">'+f$(pnl)+'</td>'+
+      '<td style="text-align:right" class="'+cl(wtd)+' mono">'+(wtd!=null?fP(wtd):'—')+'</td>';
+    tb.appendChild(tr);
+    var th=document.createElement('tr');th.id='r-'+d.k;th.className='thesis-row';
+    th.innerHTML='<td colspan="10"><div class="thesis-inner"><div class="tg">'+
+      '<div><div class="tl">Thesis</div><div class="tt">'+d.th+'</div></div>'+
+      '<div><div class="tl">Catalyst</div><div class="tt">'+d.ca+'</div></div>'+
+      '<div><div class="tl">Risk</div><div class="tt">'+d.ri+'</div></div></div></div></td>';
+    tb.appendChild(th);
+  });
+  var bRet=tPnl/BASE*100;
+  document.getElementById('stats').innerHTML=
+    '<div class="sc-card"><div class="sc-stripe" style="background:#1a56db"></div><div class="sc-tag mono">BASKET P&L</div><div class="sc-val mono '+cl(tPnl)+'">'+f$(tPnl)+'</div><div class="sc-sub">on $100K notional</div></div>'+
+    '<div class="sc-card"><div class="sc-stripe" style="background:#15803d"></div><div class="sc-tag mono">RETURN</div><div class="sc-val mono '+cl(bRet)+'">'+fP(bRet)+'</div></div>'+
+    '<div class="sc-card"><div class="sc-stripe" style="background:#b45309"></div><div class="sc-tag mono">WTD RETURN</div><div class="sc-val mono '+cl(tWtd)+'">'+fP(tWtd)+'</div></div>'+
+    '<div class="sc-card"><div class="sc-stripe" style="background:#475569"></div><div class="sc-tag mono">NAMES</div><div class="sc-val mono">'+names+'</div><div class="sc-sub">with prices</div></div>'+
+    '<div class="sc-card"><div class="sc-stripe" style="background:#7c3aed"></div><div class="sc-tag mono">MKT VALUE</div><div class="sc-val mono">'+f$(BASE+tPnl)+'</div></div>';
+}
+
+function rFilters(){
+  var el=document.getElementById('tier-filters');
+  var h='<button class="btn '+(aF==='all'?'active':'')+'" onclick="sF(\'all\')">All</button>';
+  for(var t in T)h+='<button class="btn '+(aF===t?'active':'')+'" onclick="sF(\''+t+'\')"><span class="td" style="background:'+T[t].c+'"></span>'+t+'</button>';
+  h+='<span style="margin-left:auto;font-size:10px;color:#556275">click row → thesis</span>';
+  el.innerHTML=h;
+}
+function sF(t){aF=t;rFilters();render()}
+
+function rMatrix(){
+  var el=document.getElementById('matrix-cards');el.innerHTML='';
+  var curTier='';
+  D.forEach(function(d){
+    if(d.t==='Benchmark')return;
+    var tc=T[d.t]?T[d.t].c:'#a8b5c4';
+    if(d.t!==curTier){
+      curTier=d.t;
+      var hdr=document.createElement('div');
+      hdr.style.cssText='font-size:11px;font-weight:500;letter-spacing:0.5px;color:'+tc+';margin:14px 0 6px;display:flex;align-items:center;gap:6px';
+      hdr.innerHTML='<span class="td" style="background:'+tc+'"></span>'+d.t.toUpperCase()+' — '+(T[d.t]?T[d.t].w:0)+'%';
+      el.appendChild(hdr);
+    }
+    var card=document.createElement('div');card.className='mx-card';
+    card.innerHTML='<div class="mx-stripe" style="background:'+tc+'"></div>'+
+      '<div class="mx-hdr"><div><span class="mx-tk mono">'+d.k+'</span><span class="mx-nm">'+d.n+'</span></div><div class="mx-wt mono">'+d.w+'%</div></div>'+
+      '<div class="mx-body">'+
+        '<div><div class="mx-lbl">Mythos thesis</div><div class="mx-txt">'+d.th+'</div></div>'+
+        '<div><div class="mx-lbl">Catalyst / timeline</div><div class="mx-txt">'+d.ca+'</div></div>'+
+        '<div><div class="mx-lbl">Risk</div><div class="mx-txt">'+d.ri+'</div></div></div>';
+    el.appendChild(card);
+  });
+}
+
+function rToggles(){
+  var el=document.getElementById('ct');el.innerHTML='';
+  D.forEach(function(d){
+    var tc=T[d.t]?T[d.t].c:'#a8b5c4';var on=cV[d.k];
+    var b=document.createElement('button');b.className='ct-btn'+(on?' on':'');
+    b.innerHTML='<span style="width:6px;height:6px;border-radius:2px;background:'+tc+'"></span><span class="mono">'+d.k+'</span>';
+    b.onclick=function(){cV[d.k]=!cV[d.k];sv();rToggles();rBar()};
+    el.appendChild(b);
+  });
+}
+function cAll(){D.forEach(function(d){cV[d.k]=true});sv();rToggles();rBar()}
+function cNone(){D.forEach(function(d){cV[d.k]=false});sv();rToggles();rBar()}
+var _tc=null,_bc=null;
+function rBar(){
+  var vis=D.filter(function(d){return cV[d.k]&&d.entry&&d.current});
+  var lb=vis.map(function(d){return d.k}),rt=vis.map(function(d){return Math.round(((d.current-d.entry)/d.entry)*10000)/100}),co=vis.map(function(d){return T[d.t]?T[d.t].c:'#a8b5c4'});
+  var h=Math.max(280,vis.length*26+80);
+  document.getElementById('barC').parentElement.style.height=h+'px';
+  if(_bc)_bc.destroy();
+  _bc=new Chart(document.getElementById('barC'),{type:'bar',data:{labels:lb,datasets:[{data:rt,backgroundColor:co,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',scales:{x:{grid:{color:'#eaeff5'},ticks:{callback:function(v){return v+'%'},font:{family:'"SF Mono",monospace',size:10},color:'#556275'}},y:{grid:{display:false},ticks:{font:{family:'"SF Mono",monospace',size:10},color:'#0f1a2e'}}},plugins:{legend:{display:false}}}});
+}
+function rTier(){
+  var tn=Object.keys(T).filter(function(t){return t!=='Benchmark'}),tw=tn.map(function(t){return T[t].w}),co=tn.map(function(t){return T[t].c});
+  if(_tc)_tc.destroy();
+  _tc=new Chart(document.getElementById('tierC'),{type:'doughnut',data:{labels:tn,datasets:[{data:tw,backgroundColor:co,borderWidth:1,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{font:{family:'-apple-system',size:11},color:'#556275',padding:8,usePointStyle:true,pointStyleWidth:10}}}}});
+}
+function rCharts(){rToggles();rBar();rTier()}
+
+// ── CSV ──
+function parseCSV(txt){
+  var lines=txt.replace(/\r/g,'').trim().split('\n');
+  if(lines.length<2)return null;
+  var sep=lines[0].indexOf('\t')>=0?'\t':',';
+  var hdrs=lines[0].split(sep);
+  var tickers=[];
+  for(var j=1;j<hdrs.length;j++)tickers.push(hdrs[j].trim().replace(/^"|"$/g,'').toUpperCase());
+  var rows=[];
+  for(var i=1;i<lines.length;i++){
+    var cols=lines[i].split(sep);
+    if(cols.length<2)continue;
+    var dt=cols[0].trim().replace(/^"|"$/g,'');
+    if(!dt)continue;
+    var prices={};
+    for(var j2=0;j2<tickers.length;j2++){var v=parseFloat(cols[j2+1]);if(!isNaN(v))prices[tickers[j2]]=v}
+    rows.push({date:dt,prices:prices});
+  }
+  return rows.length?{rows:rows,tickers:tickers}:null;
+}
+function populateDateSelectors(){
+  if(!csvData)return;
+  var eSel=document.getElementById('h-entry-sel');
+  var cSel=document.getElementById('h-current-sel');
+  eSel.innerHTML='';cSel.innerHTML='';
+  for(var i=0;i<csvData.rows.length;i++){
+    var dt=csvData.rows[i].date;
+    eSel.innerHTML+='<option value="'+i+'">'+dt+'</option>';
+    cSel.innerHTML+='<option value="'+i+'">'+dt+'</option>';
+  }
+  document.getElementById('date-status').textContent=csvData.rows.length+' dates loaded';
+  resetHoldingDates();
+}
+function resetHoldingDates(){
+  if(!csvData)return;
+  var eSel=document.getElementById('h-entry-sel');
+  var cSel=document.getElementById('h-current-sel');
+  var defEntry=-1;
+  for(var i=0;i<csvData.rows.length;i++){
+    if(csvData.rows[i].date==='4/7/2026')defEntry=i;
+  }
+  eSel.value=defEntry>=0?defEntry:csvData.rows.length-1;
+  cSel.value=0;
+  applyHoldingDates();
+}
+function applyHoldingDates(){
+  if(!csvData)return;
+  var ei=+document.getElementById('h-entry-sel').value;
+  var ci=+document.getElementById('h-current-sel').value;
+  var eRow=csvData.rows[ei],cRow=csvData.rows[ci];
+  if(!eRow||!cRow)return;
+  D.forEach(function(d){
+    if(eRow.prices[d.k]!==undefined)d.entry=eRow.prices[d.k];
+    if(cRow.prices[d.k]!==undefined)d.current=cRow.prices[d.k];
+  });
+  sv();render();
+}
+function handleCSV(file){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    csvData=parseCSV(e.target.result);
+    if(!csvData){toast('Could not parse CSV');return}
+    var matched=csvData.tickers.filter(function(tk){return D.some(function(d){return d.k===tk})}).length;
+    var el=document.getElementById('il');el.style.display='block';
+    el.innerHTML='<span class="up">'+csvData.rows.length+' dates · '+matched+' tickers matched</span>';
+    populateDateSelectors();
+    applyHoldingDates();
+    toast(csvData.rows.length+' dates loaded');
+  };
+  reader.readAsText(file);
+}
+document.getElementById('cf-input').addEventListener('change',function(e){if(e.target.files&&e.target.files[0])handleCSV(e.target.files[0])});
+var dz=document.getElementById('dz');
+dz.addEventListener('dragover',function(e){e.preventDefault();dz.classList.add('over')});
+dz.addEventListener('dragleave',function(){dz.classList.remove('over')});
+dz.addEventListener('drop',function(e){e.preventDefault();dz.classList.remove('over');if(e.dataTransfer.files&&e.dataTransfer.files[0])handleCSV(e.dataTransfer.files[0])});
+
+document.addEventListener('change',function(e){if(e.target.dataset.f!==undefined){var d=D[+e.target.dataset.i],v=parseFloat(e.target.value);d[e.target.dataset.f]=isNaN(v)?null:v;sv();render();toast('Updated '+d.k)}});
+
+function xCSV(){var c='Ticker,Name,Tier,Weight,Notional,Entry,Current,PnL%\n';D.forEach(function(d){var p='';if(d.entry&&d.current)p=(((d.current-d.entry)/d.entry)*100).toFixed(2);var n=d.t==='Benchmark'?0:BASE*d.w/100;c+=d.k+','+d.n+','+d.t+','+d.w+','+n+','+(d.entry||'')+','+(d.current||'')+','+p+'\n'});var b=new Blob([c],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mythos_basket_'+tS()+'.csv';a.click();toast('CSV exported')}
+function clrP(){if(!confirm('Clear all prices?'))return;D.forEach(function(d){d.entry=null;d.current=null});sv();render();toast('Prices cleared')}
+function clrA(){if(!confirm('Reset everything?'))return;localStorage.removeItem('m4');localStorage.removeItem('m4cv');D.forEach(function(d){d.entry=null;d.current=null});cV={};D.forEach(function(d){cV[d.k]=true});csvData=null;document.getElementById('h-entry-sel').innerHTML='';document.getElementById('h-current-sel').innerHTML='';document.getElementById('date-status').textContent='Load CSV on Import tab';render();toast('Reset complete')}
+
+function saveHTML(){
+  var html=document.documentElement.outerHTML;
+  var state=JSON.stringify(D.map(function(d){return{k:d.k,entry:d.entry,current:d.current}}));
+  var cvState=JSON.stringify(cV);
+  var inject='<'+'script>(function(){try{localStorage.setItem("m4",\''+state.replace(/'/g,"\\'")+'\');localStorage.setItem("m4cv",\''+cvState.replace(/'/g,"\\'")+'\');}catch(e){}})();</'+'script>';
+  var insertPoint=html.indexOf('<'+'script src=');
+  if(insertPoint===-1)insertPoint=html.indexOf('<'+'script>');
+  var out=html.slice(0,insertPoint)+inject+html.slice(insertPoint);
+  var blob=new Blob([out],{type:'text/html'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mythos_tracker_'+tS()+'.html';a.click();
+  toast('Saved with current data');
+}
+
+document.getElementById('ts').textContent=new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+ld();rFilters();render();
+</script>
+
+</body></html>
